@@ -20,4 +20,6 @@ citation_by_year <- pubList %>%
     group_by(Year) %>% 
     summarise(cites = sum(as.integer(Citation.count))) 
 
-fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col()
+fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication")
+
+fig2 <- ggplot(pubList, aes(x=Citation.count, y=Category)) + geom_point() + theme_classic() 
