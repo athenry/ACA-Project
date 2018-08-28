@@ -26,12 +26,18 @@ citation_by_year <- pubList %>%
 
 fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication")
 
-fig2 <- ggplot(pubList, aes(x=Citation.count, y=Category)) + geom_point() + theme_classic() 
+
 ## Gather data for grant mapping
+## Create data frame of locations and assigned longitude and lattitude
 
 locations <- as.data.frame(cbind(c("Banff National Park", "CFB Suffield", "Elk Island National Park", "Foothills", "Jasper National Park", "Mountain", "Northern Boreal", "Parkland", "Prairie", "Waterton Lakes National Park", "Wood Buffalo National Park"), c("-115.92797", "-111.175004", "-112.857157", "-116.817049", "-117.954272", "-116.476799", "-116.569466", "-111.575478", "-112.336827", "-113.916624", "-112.876509"), c("51.496746", "50.277093", "53.608301", "54.187166", "52.873331", "52.37858", "57.015187", "52.990867", "50.583973", "49.083404", "59.439519")))
 colnames(locations) <- c("location", "lon", "lat")
 
+## Add longitude and latitude to each grant
+grantListGeo <- grantList %>% 
+    left_join(locations, b=c("Coded.Location" = "location")) %>%
+    group_by(Year.Awarded)
+
 canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
 
-map <- canada + geom_point(aes(x=lon, y=lat, size = 2), data = locations, colour = 'purple')
+
