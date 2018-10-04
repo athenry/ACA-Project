@@ -1,6 +1,6 @@
 ## Title: ACA Visualizations
 ## Authors: Alison Henry, Christina Hwang, Katy Moore
-## Last updated: 2018/08/17
+## Last updated: 2018/10/04
 ## contact: ahenry@ualberta.ca
 
 ## Install and load needed packages

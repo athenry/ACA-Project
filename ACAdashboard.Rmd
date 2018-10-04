@@ -1,0 +1,34 @@
+---
+title: "ACA Grants in Research and Biodiversity, 1997-2017"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+Sidebar {.sidebar}
+=====================================
+
+```{r}
+# shiny inputs defined here
+```
+
+Page 1
+=====================================  
+
+### Chart 1
+    
+```{r}
+```
+   
+Page 2
+=====================================     
+
+### Chart 2
+    
+```{r}
+```
