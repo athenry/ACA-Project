@@ -5,6 +5,7 @@
 
 ## Install and load needed packages
 install.packages(c("devtools", "tidyverse", "bibliometrix", "maps", "mapdata", "mapproj","ggthemes"))
+library(devtools)
 install_github("dgrtwo/gganimate")
 library(tidyverse)
 library(bibliometrix)
@@ -19,14 +20,32 @@ grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", 
 pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
 
 ## Publication numbers
-## list desired graphics here, with corresponding figure numbers 
-##
+## (list desired graphics here, with corresponding figure numbers) 
+## Fig 1: Citations by year
+## Fig 2: Publication by year with citations
+## Fig 3: Tweets and Retweets by publication
+## Tweets and Retwees by Topic
+## Facebook interactions by publication
+## Facebook interactions by topic
+## News mentions by publication
+## News mentions by topic
+## Degree pursued by year
+## degree pursued by topic?
+## 
 
-## citation_by_year <- pubList %>% 
-##     group_by(Year) %>% 
-##     summarise(cites = sum(as.integer(Citation.count))) 
+citation_by_year <- pubList %>% 
+     group_by(Year) %>% 
+     summarise(cites = sum(as.integer(Citation.count))) 
 
-## fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication")
+fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication", x="Publication Year", y="Number of Citations")
+
+publication_by_year <- pubList %>%
+    count(Year)
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=n)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
+
+levels(pubList$Category)[1] <- "Not assigned"
+categoryPalette <- colorRampPalette(brewer.pal(7,"Dark2"))(14)
+fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Tweets and ReTweets of ACA-funded Publications", y="Number of Tweets and ReTweets", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
 
 
 ## Gather data for grant mapping

@@ -3,32 +3,97 @@ title: "ACA Grants in Research and Biodiversity, 1997-2017"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
-runtime: shiny
+    vertical_layout: scroll
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(bibliometrix)
+library(maps)
+library(mapdata)
+library(ggthemes)
+library(gganimate)
 library(flexdashboard)
+
+## Read in prepared indices
+authorList <- read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE)
+grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
+pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
 ```
-Sidebar {.sidebar}
+Citation and Altmetrics
 =====================================
 
-```{r}
-# shiny inputs defined here
-```
-
-Page 1
-=====================================  
-
 ### Chart 1
-    
-```{r}
+
+```{r citation-by-year}
+citation_by_year <- pubList %>% 
+     group_by(Year) %>% 
+     summarise(cites = sum(as.integer(Citation.count))) 
+
+fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication", x="Publication Year", y="Number of Citations")
+
+fig1
 ```
-   
-Page 2
-=====================================     
 
 ### Chart 2
-    
+
+```{r publication-by-year}
+publication_by_year <- pubList %>%
+    count(Year)
+
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=n)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
+
+fig2
+```
+
+### Chart 3
+
+```{r tweets-by-year-and-category}
+levels(pubList$Category)[1] <- "Not assigned"
+
+categoryPalette <- colorRampPalette(brewer.pal(7,"Dark2"))(14)
+
+fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Tweets and ReTweets of ACA-funded Publications", y="Number of Tweets and ReTweets", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
+ 
+fig3
+```
+
+Overview of Grants
+=====================================
+Placeholder text describing the output on this page.
+```{r location-data}
+## Gather data for grant mapping
+## Create data frame of locations and assigned longitude and lattitude
+
+locations <- as_tibble(cbind(c("Banff National Park", "CFB Suffield", "Elk Island National Park", "Foothills", "Jasper National Park", "Mountain", "Northern Boreal", "Parkland", "Prairie", "Waterton Lakes National Park", "Wood Buffalo National Park"), c("-115.92797", "-111.175004", "-112.857157", "-116.817049", "-117.954272", "-116.476799", "-116.569466", "-111.575478", "-112.336827", "-113.916624", "-112.876509"), c("51.496746", "50.277093", "53.608301", "54.187166", "52.873331", "52.37858", "57.015187", "52.990867", "50.583973", "49.083404", "59.439519")))
+
+colnames(locations) <- c("location", "lon", "lat")
+
+
+```
+
+Bibliometric Visualizations
+=====================================
+
+```{r bibliometric-data-load, include=FALSE}
+# Loading bib files into R environment
+D <- readFiles("Data/scopus.bib")
+
+# Converting the loaded files into a R bibliographic dataframe
+M <- convert2df(D, dbsource="scopus",format="bibtex")
+```
+
+### Section 1: Descriptive Analysis
+
+Bibliometrix is an open-source software package for automating the stages of data-analysis and data-visualization developed by Massimo Aria and Corrado Cuccurullo. After converting and uploading bibliographic data in R, Bibliometrix performs a descriptive analysis and different research-structure analyses.
+
+Descriptive analysis provides some snapshots about the annual research development, the top "k" productive authors, papers, countries and most relevant keywords.
+
+### Main findings about the collection
+
 ```{r}
+results <- biblioAnalysis(M)
+summary(results, k=10, pause=F, width=130)
+plot(x=results, k=10, pause=F)
 ```
