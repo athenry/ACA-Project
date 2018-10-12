@@ -1,3 +1,5 @@
+Note: Work-in-progress. None of this is working as it is suppoed to yet.
+
 # ACA-Project
 
 Project organized by Christina Hwang

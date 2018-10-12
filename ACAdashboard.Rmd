@@ -70,7 +70,24 @@ locations <- as_tibble(cbind(c("Banff National Park", "CFB Suffield", "Elk Islan
 
 colnames(locations) <- c("location", "lon", "lat")
 
+##grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
+##    left_join(locations, b=c("Coded.Location" = "location"))
 
+##grantsperTopic <- count(grantList, Detailed.Thematic.Category, Year.Awarded) %>%
+##    left_join(locations, b=c("Coded.Location" = "location"))
+
+##grantsperPriorityArea <- count(grantList, ACARG.Priority.Areas.1, Year.Awarded) %>%
+##    left_join(locations, b=c("Coded.Location" = "location"))
+
+## create base map
+
+canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
+
+canada
+
+## map1 <- canada +
+##    geom_point(aes(x=lon, y=lat), 
+##               data = grantsperLoc)
 ```
 
 Bibliometric Visualizations

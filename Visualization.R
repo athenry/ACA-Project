@@ -17,6 +17,7 @@ library(gganimate)
 ## Read in prepared indices
 authorList <- read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE)
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
+names(grantList) <- str_remove_all(names(grantList), "[.]")
 pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
 
 ## Publication numbers
@@ -34,17 +35,20 @@ pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.cs
 ## 
 
 citation_by_year <- pubList %>% 
-     group_by(Year) %>% 
-     summarise(cites = sum(as.integer(Citation.count))) 
+    group_by(Year) %>% 
+    summarise(cites = sum(as.integer(Citation.count))) 
 
 fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication", x="Publication Year", y="Number of Citations")
 
 publication_by_year <- pubList %>%
-    count(Year)
-fig2 <- ggplot(publication_by_year, aes(x=Year, y=n)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
+    count('Year')
+
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=freq)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
 
 levels(pubList$Category)[1] <- "Not assigned"
+
 categoryPalette <- colorRampPalette(brewer.pal(7,"Dark2"))(14)
+
 fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Tweets and ReTweets of ACA-funded Publications", y="Number of Tweets and ReTweets", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
 
 
@@ -58,14 +62,15 @@ colnames(locations) <- c("location", "lon", "lat")
 ## grantListGeo <- grantList %>% 
 ##    left_join(locations, b=c("Coded.Location" = "location")) 
 
-grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
-    left_join(locations, b=c("Coded.Location" = "location"))
+grantsperLoc <- grantList %>%
+    group_by(CodedLocation, YearAwarded) %>%
+    left_join(locations, b=c("CodedLocation" = "location"))
 
-grantsperTopic <- count(grantList, Detailed.Thematic.Category, Year.Awarded) %>%
-    left_join(locations, b=c("Coded.Location" = "location"))
+grantsperTopic <- count(grantList, Category, YearAwarded) %>%
+    left_join(locations, b=c("CodedLocation" = "location"))
 
-grantsperPriorityArea <- count(grantList, ACARG.Priority.Areas.1, Year.Awarded) %>%
-    left_join(locations, b=c("Coded.Location" = "location"))
+grantsperPriorityArea <- count(grantList, ACARGPriorityAreas1, YearAwarded) %>%
+    left_join(locations, b=c("CodedLocation" = "location"))
 
 ## Create our base map
 canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
