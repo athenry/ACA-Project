@@ -17,21 +17,21 @@ library(gganimate)
 
 ## Read in prepared indices
 authorList <- read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE)
+
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
 names(grantList) <- str_remove_all(names(grantList), "[.]")
+
 pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
+names(pubList) <- str_remove_all(names(pubList), "[.]")
 
 ## Publication numbers
 ## (list desired graphics here, with corresponding figure numbers) 
 ## Fig 1: Citations by year
 ## Fig 2: Publication by year with citations
 ## Fig 3: Tweets and Retweets by Article, coloured by Topic
-## Facebook interactions by publication
-## Facebook interactions by topic
-## News mentions by publication
-## News mentions by topic
-## Degree pursued by year
-## degree pursued by topic?
+## Fig 4: Facebook interactions by publication, coloured by topic
+## Fig 5: News mentions by publication, coloured by topic
+## Fig 6: Mentions by source
 
 citation_by_year <- pubList %>% 
     group_by(Year) %>% 
@@ -53,6 +53,11 @@ categoryPalette <- colorRampPalette(brewer.pal(7,"Dark2"))(14)
 
 fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Tweets and ReTweets of ACA-funded Publications", y="Number of Tweets and ReTweets", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
 
+fig4 <- ggplot(pubList, aes(x=Year, y=Facebook)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Facebook Mentions of ACA-funded Publications", y="Mentions", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
+    
+fig5 <- ggplot(pubList, aes(x=Year, y=Newsmentions)) + geom_point(aes(col=Category, size=Newsmentions)) + theme_classic() + labs(title="News Mentions of ACA-funded Publications", y="Mentions", x="Year of Publication") + scale_colour_manual(values = categoryPalette)  
+
+fig6 <- ggplot(pubList, aes(x = Year, y = value)) + theme_classic() + geom_point(aes(y = Facebook, colour = 'navy', size = Facebook)) + geom_point(aes(y = Twitter, colour = 'skyblue', size = Twitter)) + geom_point(aes(y = Newsmentions, col = 'green', size = Newsmentions)) + labs(title = "Mentions of ACA-funded Publications", y = "Mentions", x = "Year of Publication") 
 
 ## Grant overview: mapping of location studied, types of grants (biodiversity vs research), by degree?, locations of researchers?
 
@@ -64,18 +69,16 @@ locations <- as_tibble(cbind(c("Banff National Park", "CFB Suffield", "Elk Islan
 colnames(locations) <- c("location", "lon", "lat")
 
 ## Add longitude and latitude to each grant
-## grantListGeo <- grantList %>% 
-##    left_join(locations, b=c("Coded.Location" = "location")) 
+grantListGeo <- grantList %>% 
+    left_join(locations, b=c("CodedLocation" = "location")) 
 
-grantsperLoc <- grantList %>%
+grantsperLoc <- grantListGeo %>%
     group_by(CodedLocation, YearAwarded) %>%
-    left_join(locations, b=c("CodedLocation" = "location"))
+    summarise(grants = n())
 
-grantsperTopic <- count(grantList, Category, YearAwarded) %>%
-    left_join(locations, b=c("CodedLocation" = "location"))
+grantsperTopic <- count(grantListGeo, DetailedThematicCategoryALL, YearAwarded) 
 
-grantsperPriorityArea <- count(grantList, ACARGPriorityAreas1, YearAwarded) %>%
-    left_join(locations, b=c("CodedLocation" = "location"))
+grantsperPriorityArea <- count(grantListGeo, ACARGPriorityAreas1, YearAwarded)
 
 ## Create our base map
 canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
