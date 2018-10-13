@@ -8,6 +8,7 @@ install.packages(c("devtools", "tidyverse", "bibliometrix", "maps", "mapdata", "
 library(devtools)
 install_github("dgrtwo/gganimate")
 library(tidyverse)
+library(RColorBrewer)
 library(bibliometrix)
 library(maps)
 library(mapdata)
@@ -24,15 +25,13 @@ pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.cs
 ## (list desired graphics here, with corresponding figure numbers) 
 ## Fig 1: Citations by year
 ## Fig 2: Publication by year with citations
-## Fig 3: Tweets and Retweets by publication
-## Tweets and Retwees by Topic
+## Fig 3: Tweets and Retweets by Article, coloured by Topic
 ## Facebook interactions by publication
 ## Facebook interactions by topic
 ## News mentions by publication
 ## News mentions by topic
 ## Degree pursued by year
 ## degree pursued by topic?
-## 
 
 citation_by_year <- pubList %>% 
     group_by(Year) %>% 
@@ -41,15 +40,21 @@ citation_by_year <- pubList %>%
 fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication", x="Publication Year", y="Number of Citations")
 
 publication_by_year <- pubList %>%
-    count('Year')
+    group_by(Year) %>%
+    summarise(articles = n())
 
-fig2 <- ggplot(publication_by_year, aes(x=Year, y=freq)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
+## Note: number of citations is much higher than the number of articles. Add secondary axis so as not to lose relevance of the publication record. 
+
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Articles") + geom_line(data = citation_by_year, aes(x=Year, y=cites/25, colour = "red"), show.legend = FALSE) + scale_y_continuous(sec.axis = sec_axis(~ . *20, breaks = waiver(), labels = waiver(), name = "Citations"))
 
 levels(pubList$Category)[1] <- "Not assigned"
 
 categoryPalette <- colorRampPalette(brewer.pal(7,"Dark2"))(14)
 
 fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, size=Twitter)) + theme_classic() + labs(title="Tweets and ReTweets of ACA-funded Publications", y="Number of Tweets and ReTweets", x="Year of Publication") + scale_colour_manual(values = categoryPalette)
+
+
+## Grant overview: mapping of location studied, types of grants (biodiversity vs research), by degree?, locations of researchers?
 
 
 ## Gather data for grant mapping
@@ -80,4 +85,5 @@ map1 <- canada +
                data = grantsperLoc,
                colour = 'green', alpha = .5)
     
-    
+
+## Bibliometric visualizations: most prolific producers, top journals, any network analysis?   

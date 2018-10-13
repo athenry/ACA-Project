@@ -40,9 +40,10 @@ fig1
 
 ```{r publication-by-year}
 publication_by_year <- pubList %>%
-    count(Year)
+    group_by(Year) %>%
+    summarise(articles = n())
 
-fig2 <- ggplot(publication_by_year, aes(x=Year, y=n)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Number of articles")
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Articles") + geom_line(data = citation_by_year, aes(x=Year, y=cites/25, colour = "red"), show.legend = FALSE) + scale_y_continuous(sec.axis = sec_axis(~ . *20, breaks = waiver(), labels = waiver(), name = "Citations"))
 
 fig2
 ```
