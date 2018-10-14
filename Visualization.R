@@ -35,7 +35,7 @@ names(pubList) <- str_remove_all(names(pubList), "[.]")
 
 citation_by_year <- pubList %>% 
     group_by(Year) %>% 
-    summarise(cites = sum(as.integer(Citation.count))) 
+    summarise(cites = sum(as.integer(Citationcount))) 
 
 fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_classic() + labs(title="Citations by Year of Publication", x="Publication Year", y="Number of Citations")
 
@@ -45,7 +45,7 @@ publication_by_year <- pubList %>%
 
 ## Note: number of citations is much higher than the number of articles. Add secondary axis so as not to lose relevance of the publication record. 
 
-fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Articles") + geom_line(data = citation_by_year, aes(x=Year, y=cites/25, colour = "red"), show.legend = FALSE) + scale_y_continuous(sec.axis = sec_axis(~ . *20, breaks = waiver(), labels = waiver(), name = "Citations"))
+fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + theme_classic() + labs(title = "Number of Publications by Year", x="Publication Year", y="Articles") + geom_line(data = citation_by_year, aes(x=Year, y=cites/20), colour = "red", show.legend = FALSE) + scale_y_continuous(sec.axis = sec_axis(~ . *20, breaks = waiver(), labels = waiver(), name = "Citations"))
 
 levels(pubList$Category)[1] <- "Not assigned"
 
@@ -57,7 +57,7 @@ fig4 <- ggplot(pubList, aes(x=Year, y=Facebook)) + geom_point(aes(col=Category, 
     
 fig5 <- ggplot(pubList, aes(x=Year, y=Newsmentions)) + geom_point(aes(col=Category, size=Newsmentions)) + theme_classic() + labs(title="News Mentions of ACA-funded Publications", y="Mentions", x="Year of Publication") + scale_colour_manual(values = categoryPalette)  
 
-fig6 <- ggplot(pubList, aes(x = Year, y = value)) + theme_classic() + geom_point(aes(y = Facebook, colour = 'navy', size = Facebook)) + geom_point(aes(y = Twitter, colour = 'skyblue', size = Twitter)) + geom_point(aes(y = Newsmentions, col = 'green', size = Newsmentions)) + labs(title = "Mentions of ACA-funded Publications", y = "Mentions", x = "Year of Publication") 
+fig6 <- ggplot(pubList, aes(x = Year, y = value)) + theme_classic() + geom_point(aes(y = Facebook, size = Facebook), colour = 'blue') + geom_point(aes(y = Twitter, size = Twitter), colour = 'skyblue') + geom_point(aes(y = Newsmentions, size = Newsmentions), col = 'red') + labs(title = "Mentions of ACA-funded Publications", y = "Mentions", x = "Year of Publication") 
 
 ## Grant overview: mapping of location studied, types of grants (biodiversity vs research), by degree?, locations of researchers?
 
