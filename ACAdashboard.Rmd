@@ -18,10 +18,14 @@ library(leaflet)
 library(flexdashboard)
 
 ## Read in prepared indices
-authorList <- read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE)
+authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE, stringsAsFactors = FALSE), -1)
+authorList$ACA.publications <- as.numeric(authorList$ACA.publications)
+
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
+
 pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
 ```
+
 Citation and Altmetrics
 =====================================
 
@@ -61,6 +65,16 @@ fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, s
 fig3
 ```
 
+### Table 1
+
+```{r Author-table}
+
+ACAauthors <- subset(authorList, ACA.publications != 0)
+ACAauthors$ACA.publications <- as.numeric(ACAauthors$ACA.publications)
+library(DT)
+DT::datatable(ACAauthors[,c("Last.name", "First.name", "ACA.publications")], rownames = FALSE, options = list(pageLength = 10))
+```
+
 Overview of Grants
 =====================================
 Placeholder text describing the output on this page.
@@ -79,6 +93,7 @@ locations$lat <- as.numeric(locations$lat)
 grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
     left_join(locations, b=c("Coded.Location" = "location"))
 
+
 ##grantsperTopic <- count(grantList, Detailed.Thematic.Category, Year.Awarded) %>%
 ##    left_join(locations, b=c("Coded.Location" = "location"))
 
@@ -88,8 +103,10 @@ grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
 ## create base map
 
 canada <- leaflet(grantsperLoc) %>%
-    addCircles()
+    addTiles() %>%
+    addMarkers(popup = ~as.character(Coded.Location))
 
+canada
 
 ```
 

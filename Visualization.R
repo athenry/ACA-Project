@@ -17,7 +17,8 @@ library(gganimate)
 library(DT)
 
 ## Read in prepared indices
-authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE), -1)
+authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE, stringsAsFactors = FALSE), -1)
+authorList$ACA.publications <- as.numeric(authorList$ACA.publications)
 
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
 names(grantList) <- str_remove_all(names(grantList), "[.]")
