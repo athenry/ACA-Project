@@ -25,7 +25,7 @@ pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.cs
 Citation and Altmetrics
 =====================================
 
-### Chart 1
+### Fig. 1
 
 ```{r citation-by-year}
 citation_by_year <- pubList %>% 
@@ -37,7 +37,7 @@ fig1 <- ggplot(citation_by_year, aes(x=Year, y=cites)) + geom_col() + theme_clas
 fig1
 ```
 
-### Chart 2
+### Fig. 2
 
 ```{r publication-by-year}
 publication_by_year <- pubList %>%
@@ -49,7 +49,7 @@ fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + them
 fig2
 ```
 
-### Chart 3
+### Fig. 3
 
 ```{r tweets-by-year-and-category}
 levels(pubList$Category)[1] <- "Not assigned"
@@ -68,12 +68,16 @@ Placeholder text describing the output on this page.
 ## Gather data for grant mapping
 ## Create data frame of locations and assigned longitude and lattitude
 
-locations <- as_tibble(cbind(c("Banff National Park", "CFB Suffield", "Elk Island National Park", "Foothills", "Jasper National Park", "Mountain", "Northern Boreal", "Parkland", "Prairie", "Waterton Lakes National Park", "Wood Buffalo National Park"), c("-115.92797", "-111.175004", "-112.857157", "-116.817049", "-117.954272", "-116.476799", "-116.569466", "-111.575478", "-112.336827", "-113.916624", "-112.876509"), c("51.496746", "50.277093", "53.608301", "54.187166", "52.873331", "52.37858", "57.015187", "52.990867", "50.583973", "49.083404", "59.439519")))
+locations <- as.tibble(cbind(c("Banff National Park", "CFB Suffield", "Elk Island National Park", "Foothills", "Jasper National Park", "Mountain", "Northern Boreal", "Parkland", "Prairie", "Waterton Lakes National Park", "Wood Buffalo National Park", "Unknown", ""), c("-115.92797", "-111.175004", "-112.857157", "-116.817049", "-117.954272", "-116.476799", "-116.569466", "-111.575478", "-112.336827", "-113.916624", "-112.876509", "-113.528040", "-113.528040"), c("51.496746", "50.277093", "53.608301", "54.187166", "52.873331", "52.37858", "57.015187", "52.990867", "50.583973", "49.083404", "59.439519", "53.526210", "53.524449")))
 
-colnames(locations) <- c("location", "lon", "lat")
+colnames(locations) <- c("location", "lng", "lat")
 
-##grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
-##    left_join(locations, b=c("Coded.Location" = "location"))
+locations$location <- as.factor(locations$location)
+locations$lng <- as.numeric(locations$lng)
+locations$lat <- as.numeric(locations$lat)
+
+grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
+    left_join(locations, b=c("Coded.Location" = "location"))
 
 ##grantsperTopic <- count(grantList, Detailed.Thematic.Category, Year.Awarded) %>%
 ##    left_join(locations, b=c("Coded.Location" = "location"))
@@ -83,13 +87,10 @@ colnames(locations) <- c("location", "lon", "lat")
 
 ## create base map
 
-canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
+canada <- leaflet(grantsperLoc) %>%
+    addCircles()
 
-canada
 
-## map1 <- canada +
-##    geom_point(aes(x=lon, y=lat), 
-##               data = grantsperLoc)
 ```
 
 Bibliometric Visualizations
