@@ -10,10 +10,11 @@ output:
 library(tidyverse)
 library(RColorBrewer)
 library(bibliometrix)
-library(maps)
-library(mapdata)
-library(ggthemes)
-library(gganimate)
+##library(maps)
+##library(mapdata)
+##library(ggthemes)
+##library(gganimate)
+library(leaflet)
 library(flexdashboard)
 
 ## Read in prepared indices

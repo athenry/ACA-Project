@@ -14,9 +14,10 @@ library(maps)
 library(mapdata)
 library(ggthemes)
 library(gganimate)
+library(DT)
 
 ## Read in prepared indices
-authorList <- read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE)
+authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE), -1)
 
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
 names(grantList) <- str_remove_all(names(grantList), "[.]")
@@ -32,6 +33,7 @@ names(pubList) <- str_remove_all(names(pubList), "[.]")
 ## Fig 4: Facebook interactions by publication, coloured by topic
 ## Fig 5: News mentions by publication, coloured by topic
 ## Fig 6: Mentions by source
+## Table 1: Author list and number of publications
 
 citation_by_year <- pubList %>% 
     group_by(Year) %>% 
@@ -57,7 +59,13 @@ fig4 <- ggplot(pubList, aes(x=Year, y=Facebook)) + geom_point(aes(col=Category, 
     
 fig5 <- ggplot(pubList, aes(x=Year, y=Newsmentions)) + geom_point(aes(col=Category, size=Newsmentions)) + theme_classic() + labs(title="News Mentions of ACA-funded Publications", y="Mentions", x="Year of Publication") + scale_colour_manual(values = categoryPalette)  
 
-fig6 <- ggplot(pubList, aes(x = Year, y = value)) + theme_classic() + geom_point(aes(y = Facebook, size = Facebook), colour = 'blue') + geom_point(aes(y = Twitter, size = Twitter), colour = 'skyblue') + geom_point(aes(y = Newsmentions, size = Newsmentions), col = 'red') + labs(title = "Mentions of ACA-funded Publications", y = "Mentions", x = "Year of Publication") 
+fig6 <- ggplot(pubList, aes(x = Year, y = value)) + theme_classic() + geom_point(aes(y = Facebook, size = Facebook), colour = 'blue') + geom_point(aes(y = Twitter, size = Twitter), colour = 'skyblue') + geom_point(aes(y = Newsmentions, size = Newsmentions), col = 'red') + labs(title = "Mentions of ACA-funded Publications", y = "Mentions", x = "Year of Publication") + scale_colour_manual(name = "Source", labels = c("Facebook", "Twitter", "News"), values = c("blue", "skyblue", "red")) + scale_size_continuous(guide=FALSE)
+
+## Table 1: Interactive table of authors
+ACAauthors <- subset(authorList, ACA.publications != 0)
+ACAauthors$ACA.publications <- as.numeric(ACAauthors$ACA.publications)
+library(DT)
+DT::datatable(ACAauthors[,c("Last.name", "First.name", "ACA.publications")], rownames = FALSE, options = list(pageLength = 10))
 
 ## Grant overview: mapping of location studied, types of grants (biodiversity vs research), by degree?, locations of researchers?
 
