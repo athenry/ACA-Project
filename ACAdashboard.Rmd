@@ -22,6 +22,7 @@ authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.
 authorList$ACA.publications <- as.numeric(authorList$ACA.publications)
 
 grantList <- read.csv("Data/ACA Grants Index 1997-2017 - ACA Grants Index.csv", header = TRUE)
+names(grantList) <- str_remove_all(names(grantList), "[.]")
 
 pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.csv")
 ```
@@ -29,6 +30,8 @@ pubList <- read.csv("Data/ACA Publication Index 1997-2017 - Publication index.cs
 Citation and Altmetrics
 =====================================
 
+Column {data-width=500}
+-------------------------------------
 ### Fig. 1
 
 ```{r citation-by-year}
@@ -53,6 +56,8 @@ fig2 <- ggplot(publication_by_year, aes(x=Year, y=articles)) + geom_col() + them
 fig2
 ```
 
+Column {data-width=500}
+-------------------------------------
 ### Fig. 3
 
 ```{r tweets-by-year-and-category}
@@ -65,7 +70,7 @@ fig3 <- ggplot(pubList, aes(x=Year, y=Twitter)) + geom_point(aes(col=Category, s
 fig3
 ```
 
-### Table 1
+### Author List 
 
 ```{r Author-table}
 
@@ -77,7 +82,11 @@ DT::datatable(ACAauthors[,c("Last.name", "First.name", "ACA.publications")], row
 
 Overview of Grants
 =====================================
-Placeholder text describing the output on this page.
+
+Map of grant locations
+
+Column {data-width=600}
+-------------------------------------
 ```{r location-data}
 ## Gather data for grant mapping
 ## Create data frame of locations and assigned longitude and lattitude
@@ -90,24 +99,35 @@ locations$location <- as.factor(locations$location)
 locations$lng <- as.numeric(locations$lng)
 locations$lat <- as.numeric(locations$lat)
 
-grantsperLoc <- count(grantList, Coded.Location, Year.Awarded) %>%
-    left_join(locations, b=c("Coded.Location" = "location"))
+grantsperLoc <- count(grantList, CodedLocation, YearAwarded) %>%
+    left_join(locations, b=c("CodedLocation" = "location"))
 
 
-##grantsperTopic <- count(grantList, Detailed.Thematic.Category, Year.Awarded) %>%
-##    left_join(locations, b=c("Coded.Location" = "location"))
+##grantsperTopic <- count(grantList, DetailedThematicCategory, YearAwarded) %>%
+##    left_join(locations, b=c("CodedLocation" = "location"))
 
-##grantsperPriorityArea <- count(grantList, ACARG.Priority.Areas.1, Year.Awarded) %>%
-##    left_join(locations, b=c("Coded.Location" = "location"))
+##grantsperPriorityArea <- count(grantList, ACARGPriorityAreas1, YearAwarded) %>%
+##    left_join(locations, b=c("CodedLocation" = "location"))
 
 ## create base map
 
 canada <- leaflet(grantsperLoc) %>%
     addTiles() %>%
-    addMarkers(popup = ~as.character(Coded.Location))
+    addMarkers(popup = ~as.character(CodedLocation))
 
 canada
 
+```
+
+Column {data-width=400}
+-------------------------------------
+
+### Grant List
+
+```{r Grant-table}
+
+library(DT)
+DT::datatable(grantList[,c("CurrentGrantName", "YearAwarded", "GrantValue", "ProjectTitle", "CodedLocation")], rownames = FALSE, filter = "top", options = list(pageLength = 10))
 ```
 
 Bibliometric Visualizations
