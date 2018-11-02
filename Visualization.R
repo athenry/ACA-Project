@@ -4,17 +4,19 @@
 ## contact: ahenry@ualberta.ca
 
 ## Install and load needed packages
-install.packages(c("devtools", "tidyverse", "bibliometrix", "maps", "mapdata", "mapproj","ggthemes"))
+install.packages(c("devtools", "tidyverse", "bibliometrix", "maps", "mapdata", "mapproj","ggthemes", "sf"))
 library(devtools)
 install_github("dgrtwo/gganimate")
 library(tidyverse)
 library(RColorBrewer)
 library(bibliometrix)
-library(maps)
-library(mapdata)
+##library(maps)
+##library(mapdata)
 library(ggthemes)
 library(gganimate)
 library(DT)
+library(sf)
+
 
 ## Read in prepared indices
 authorList <- tail(read.csv("Data/ACA Author Index 1997-2017 - ACA author index.csv", header=TRUE, stringsAsFactors = FALSE), -1)
@@ -89,13 +91,9 @@ grantsperTopic <- count(grantListGeo, DetailedThematicCategoryALL, YearAwarded)
 
 grantsperPriorityArea <- count(grantListGeo, ACARGPriorityAreas1, YearAwarded)
 
-## Create our base map
-canada <- ggplot() + borders(database = "worldHires", "Canada", colour = "gray80", fill = "gray85") + theme_map()
+## Create our base map - Import shapefile downloaded from Altalis
 
-map1 <- canada +
-    geom_point(aes(x=lon, y=lat), 
-               data = grantsperLoc,
-               colour = 'green', alpha = .5)
-    
+library(sf)
+Alberta <- sf::st_read("GEO_Admin_SHP_Geographic/bf_geoadmin_15-10-2018/Wildlife Management Unit.shp")
 
 ## Bibliometric visualizations: most prolific producers, top journals, any network analysis?   
