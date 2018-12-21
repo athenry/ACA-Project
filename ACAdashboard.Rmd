@@ -111,14 +111,11 @@ grantsperLoc <- count(grantList, CodedLocation, YearAwarded) %>%
 
 ## create base map
 
-## canada <- leaflet(grantsperLoc) %>%
-##    addTiles() %>%
-##    addMarkers(popup = ~as.character(CodedLocation))
-
-## canada
 library(sf)
 Alberta <- sf::st_read("GEO_Admin_SHP_Geographic/bf_geoadmin_15-10-2018/Wildlife Management Unit.shp")
 plot(Alberta)
+
+Alberta$
 ```
 
 Column {data-width=400}

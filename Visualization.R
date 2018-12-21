@@ -95,5 +95,10 @@ grantsperPriorityArea <- count(grantListGeo, ACARGPriorityAreas1, YearAwarded)
 
 library(sf)
 Alberta <- sf::st_read("GEO_Admin_SHP_Geographic/bf_geoadmin_15-10-2018/Wildlife Management Unit.shp")
+Alberta$WMUNIT_COD <- as.integer(Alberta$WMUNIT_COD)
+
+WMUloc <- read.csv("WMU.csv")
+
+Alberta$CodedLocation <- WMUloc[match(Alberta$WMUNIT_COD, WMUloc$WMUNIT_COD), "CodedLocation"]
 
 ## Bibliometric visualizations: most prolific producers, top journals, any network analysis?   
