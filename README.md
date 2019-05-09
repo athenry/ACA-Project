@@ -1,4 +1,4 @@
-Note: Work-in-progress. None of this is working as it is suppoed to yet.
+Note: Work-in-progress. None of this is working as it is supposed to yet.
 
 # ACA-Project
 
